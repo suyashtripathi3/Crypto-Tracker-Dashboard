@@ -13,21 +13,20 @@ export default function Home() {
   const fetchData = async () => {
     try {
       setErrorMsg(""); // reset error
-      // const res = await axios.get("http://localhost:5000/api/coins");
-      const res = await axios.get("https://crypto-tracker-dashboard-3n2b.onrender.com/api/coins");
+      const res = await axios.get("http://localhost:8080/api/coins");
+      // const res = await axios.get("https://crypto-tracker-dashboard-3n2b.onrender.com/api/coins");
       setCoins(res.data);
       setFiltered(res.data);
     } catch (error) {
       console.error("Error fetching coins:", error);
-
-      // ✅ Handle API limit
       if (error.response?.status === 429) {
         setErrorMsg(
           "⚠️ Too many requests! Please wait a minute before retrying."
         );
       } else if (error.code === "ERR_NETWORK") {
         setErrorMsg("🚫 Cannot reach server. Please check your backend.");
-      } else {
+      } 
+      else {
         setErrorMsg("❌ Something went wrong. Try again later.");
       }
     }

@@ -40,15 +40,18 @@ export const startCron = () => {
         price: coin.current_price,
         marketCap: coin.market_cap,
         change24h: coin.price_change_percentage_24h,
+        timestamp: new Date(),
       }));
 
       await HistoryData.insertMany(records);
       console.log("✅ Hourly snapshot saved.");
     } catch (err) {
       if (err.response?.status === 429) {
-        console.error(
-          `🚫 Rate limit hit! Retry after ${err.response.headers["retry-after"]} seconds.`
-        );
+        const retryAfter = err.response.headers["retry-after"] || 60;
+        console.error(`🚫 Rate limit hit! Retrying after ${retryAfter}s`);
+        setTimeout(startCron, retryAfter * 1000);
+      } else if (err.code === "ENOTFOUND") {
+        console.error("🌐 Network error — check your internet or API URL");
       } else {
         console.error("❌ Cron Error:", err.message);
       }
