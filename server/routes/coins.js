@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
         headers: {
           "User-Agent": "CryptoTracker/1.0",
         },
-        timeout: 5000, // avoid hanging if API slow
+        timeout: 5000,
       }
     );
 
@@ -32,13 +32,11 @@ router.get("/", async (req, res) => {
       timestamp: new Date(),
     }));
 
-    // Replace old data with fresh data
     await CurrentData.deleteMany({});
     await CurrentData.insertMany(formatted);
 
     return res.json(formatted);
   } catch (err) {
-    // ✅ Clean, friendly logging — no stack trace
     if (err.response?.status === 429) {
       console.warn("⚠️ CoinGecko rate limit reached. Try again later.");
       return res
@@ -49,16 +47,9 @@ router.get("/", async (req, res) => {
       return res
         .status(504)
         .json({ message: "CoinGecko API timeout. Try again shortly." });
-    } else if (err.code === "ENOTFOUND" || err.code === "ECONNREFUSED") {
-      console.warn("🚫 Cannot connect to CoinGecko API.");
-      return res
-        .status(503)
-        .json({ message: "CoinGecko service unavailable right now." });
     } else {
-      console.warn("❌ Unexpected error while fetching crypto data.");
-      return res
-        .status(500)
-        .json({ message: "Server error while fetching crypto data." });
+      console.warn("💥 Unexpected error occurred. Restarting server...");
+      process.exit(1); 
     }
   }
 });
