@@ -14,7 +14,7 @@ export default function Home() {
     try {
       setErrorMsg(""); // reset error
       // const res = await axios.get("http://localhost:8080/api/coins");
-      const res = await axios.get("https://crypto-tracker-dashboard-3n2b.onrender.com/api/coins");
+      const res = await axios.get("https://crypto-tracker-dashboard-backend.vercel.app/api/coins");
       setCoins(res.data);
       setFiltered(res.data);
     } catch (error) {
